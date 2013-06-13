@@ -1,0 +1,12 @@
+{application, slg_proto,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { slg_proto_app, []}},
+  {env, []}
+ ]}.
