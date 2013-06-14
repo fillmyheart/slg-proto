@@ -9,4 +9,5 @@
 key(code_ack) -> ?API_CODE_ACK;
 key(login_req) -> ?API_LOGIN_REQ;
 key(snapshot_ack) -> ?API_SNAPSHOT_ACK;
+key(building_up_req) -> ?API_BUILDING_UP_REQ;
 key(_) -> xx.

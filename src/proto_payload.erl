@@ -81,7 +81,7 @@ decode_string(<<Length:16/unsigned-big-integer,Data/binary>>)  ->
 encode_array_item([],_Fun) ->
   [];
 encode_array_item([H|T],Fun) ->
-  [protocal_payload:Fun(H) | encode_array_item(T,Fun)].
+  [proto_payload:Fun(H) | encode_array_item(T,Fun)].
 
 encode_array(Array,Fun) when is_list(Array) ->
   List = encode_array_item(Array,Fun),
@@ -92,7 +92,7 @@ encode_array(Array,Fun) when is_list(Array) ->
 decode_array_item(0, <<Data/binary>>, _Fun) ->
   [Data];
 decode_array_item(N, <<Data/binary>>, Fun) ->
-  {Item, ItemDataLeft} = protocal_payload:Fun(Data),
+  {Item, ItemDataLeft} = proto_payload:Fun(Data),
   [Item | decode_array_item(N-1, ItemDataLeft, Fun)].
 
 decode_array(<<ArrayLen:16/unsigned-big-integer, Data/binary>>, Fun) ->
