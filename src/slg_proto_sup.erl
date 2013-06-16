@@ -24,6 +24,14 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
+  Config = {
+    conn_config,
+    {conn_config, start_link, []},
+    transient,
+    infinity,
+    worker,
+    [config]
+   },
   Acceptor = {
     conn_acceptor,
     {conn_acceptor, start_link, [self()]},
@@ -41,5 +49,5 @@ init([]) ->
     supervisor,
     []
    },
-  {ok, { {one_for_one, 5, 10}, [Acceptor, ConnSup]} }.
+  {ok, { {one_for_one, 5, 10}, [Config, Acceptor, ConnSup]} }.
 

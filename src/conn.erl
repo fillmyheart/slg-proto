@@ -18,7 +18,6 @@
           player_id                      %% 玩家ID
          }).
 
-
 -include("proto.hrl").
 
 start_link(Socket) ->
@@ -60,7 +59,8 @@ handle_info(_, State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
-terminate(_Reason, _State) ->
+terminate(Reason, State) ->
+  conn_config:exec(terminate, [Reason, State]),
   ok.
 
 keep_alive_or_close(Keep, State) ->
