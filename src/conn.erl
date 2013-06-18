@@ -5,10 +5,10 @@
 -behavior(gen_server).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
-         send/2, terminate/2, code_change/3]).
+         terminate/2, code_change/3]).
 
 -export([start_link/1,
-         code_ack/1,
+         send/2,
          stop/1]).
 
 %% 连接进程状态
@@ -76,10 +76,4 @@ send(TypeAtom, Paylod) ->
   Type = proto_api:key(TypeAtom),
   Bin = proto_encoder:encode(Type, Paylod),
   gen_tcp:send(Socket, Bin),
-  ok.
-
-code_ack(Code) ->
-  CodeInt = proto_error:key(Code),
-  Common = #pt_code{code = CodeInt},
-  send(code_ack, Common),
   ok.
