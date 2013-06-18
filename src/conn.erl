@@ -33,11 +33,13 @@ init([Socket]) ->
   erlang:put(socket, Socket),
   {ok, State}.
 
-handle_cast(_, State) ->
-  {noreply, State}.
+handle_cast(Cast, State) ->
+  State1 = conn_config:exec(cast, [Cast, State]),
+  {noreply, State1}.
 
-handle_call(_Msg, _From, State) ->
-  {reply, ok, State}.
+handle_call(Call, From, State) ->
+  State1 = conn_config:exec(cast, [Call, From, State]),
+  {reply, ok, State1}.
 
 handle_info({tcp_closed, Socket}, State)
   when Socket == State#state.socket ->
@@ -54,13 +56,14 @@ handle_info({tcp, Socket, Bin}, State) ->
   M:F(Payload),
   keep_alive_or_close(keep_alive, State);
 
-handle_info(_, State) ->
+handle_info(Info, State) ->
+  conn_config:exec(info, [Info, State]),
   {noreply, State}.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 terminate(Reason, State) ->
-  conn_config:exec(terminate, [Reason, State]),
+  conn_config:exec(quit, [Reason, State]),
   ok.
 
 keep_alive_or_close(Keep, State) ->
