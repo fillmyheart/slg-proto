@@ -305,8 +305,8 @@ def parse_api()
       api=Api.new(array[1])
       complete=1
     elsif array[0]=="name"
-      unless ["req","ack","ntf"].include?(array[1].split("_")[-1])
-        raise "api name must be end with [req|ack|ntf]"
+      unless ["req","ack","ntf", "cah"].include?(array[1].split("_")[-1])
+        raise "api name must be end with [req|ack|ntf|cah]"
       end
       api.cls = array[1].split("_")[-1]
       api.name=array[1]
