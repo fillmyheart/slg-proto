@@ -76,7 +76,6 @@ keep_alive_or_close(Keep, State) ->
 %% 一些副作用代码
 send(TypeAtom, Paylod) ->
   Socket = erlang:get(socket),
-  Type = proto_api:key(TypeAtom),
-  Bin = proto_encoder:encode(Type, Paylod),
+  Bin = proto_encoder:encode(TypeAtom, Paylod),
   gen_tcp:send(Socket, Bin),
   ok.

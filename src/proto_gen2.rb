@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
-if ARGV.length >= 1
-  $proj_path = ARGV[0]+"/"
+# proto_dir  svn_dir code_dir
+if ARGV.length >= 3
+  $proto_path = ARGV[0]+"/"
+  $svn_path = ARGV[1]+"/"
+  $code_path = ARGV[2]+"/"
 else
-  $proj_path = "./"
+  $proto_path = "./proto/"
+  $svn_path = "./proto/svn/"
+  $code_path = "./proto/code/"
 end
 
 # 假定该路径下存放/proto，将过滤的旧协议内容生成在/proto/svn/路径
@@ -115,7 +120,7 @@ end
 
 # 输出客户端可是识别的协议格式
 def svn_api(api_list)
-  file = open($proj_path + "proto/svn/api.txt", "w")
+  file = open($svn_path + "api.txt", "w")
   api_list.each_with_index do |api, index|
     file.write("packet_type:#{api["packet_type"]}\n")
     file.write("name:#{api["name"]}\n")
@@ -129,7 +134,7 @@ end
 
 # 输出客户端可识别的协议格式
 def svn_proto(proto_list)
-  file = open($proj_path + "proto/svn/protocal.txt", "w")
+  file = open($svn_path + "protocal.txt", "w")
   proto_list.each_with_index do |proto, index|
     proto["comments"].each do |t|
       file.write(t + "\n")
@@ -150,7 +155,7 @@ end
 
 # 生成record定义
 def gen_record_hrl(proto_list)
-  file = open($proj_path + "proto/code/proto_record.hrl", "w")
+  file = open($code_path + "proto_record.hrl", "w")
   proto_list.each do |proto|
     proto["comments"].each do |c|
       file.write("%% #{c.strip()}\n")
@@ -223,7 +228,7 @@ end
 
 # 生成协议打解包代码
 def gen_indian(proto_list)
-  file = open($proj_path + "proto/code/proto_indian.hrl", "w")
+  file = open($code_path + "proto_indian.hrl", "w")
   proto_list.each do |proto|
     file.write("%% #{proto["name"]}\n")
     gen_indian_encode(file, proto)
@@ -234,7 +239,7 @@ end
 
 # 生成encoder
 def gen_encoder(api_list)
-  file = open($proj_path + "src/proto_encoder.erl", "w")
+  file = open($code_path + "proto_encoder.erl", "w")
   file.write("-module(proto_encoder).\n")
   file.write("-compile(export_all).\n\n")
   file.write("-include(\"proto_const.hrl\").\n")
@@ -259,7 +264,7 @@ end
 
 # 生成encoder
 def gen_decoder(api_list)
-  file = open($proj_path + "proto/code/proto_decoder.erl", "w")
+  file = open($code_path + "proto_decoder.erl", "w")
   file.write("-module(proto_decoder).\n")
   file.write("-compile(export_all).\n\n")
   file.write("-include(\"proto_const.hrl\").\n")
@@ -279,7 +284,7 @@ end
 
 # 生成路由代码
 def gen_route(api_list)
-  file = open($proj_path + "proto/code/proto_route.erl", "w")
+  file = open($code_path + "proto_route.erl", "w")
   file.write("-module(proto_route).\n")
   file.write("-export([route/1]).\n\n")
   request_list = api_list.select {|api| /_req$/ =~ api["name"]}
@@ -295,7 +300,7 @@ end
 
 # 生成错误码映射.
 def gen_error(error_list)
-  file = open($proj_path + "proto/code/proto_error.erl", "w")
+  file = open($code_path + "proto_error.erl", "w")
   file.write("-module(proto_error).\n")
   file.write("-export([key/1]).\n\n")
   error_list.each_with_index do |error, index|
@@ -309,9 +314,9 @@ def gen_error(error_list)
   file.close()
 end
 
-api_list = parse_api($proj_path + "proto/api.txt")
-proto_list = parse_proto($proj_path + "proto/protocal.txt")
-error_list = parse_error($proj_path + "proto/error_code.txt")
+api_list = parse_api($proto_path  + "api.txt")
+proto_list = parse_proto($proto_path + "protocal.txt")
+error_list = parse_error($proto_path + "error_code.txt")
 
 svn_api(api_list)
 svn_proto(proto_list)
@@ -322,4 +327,4 @@ gen_decoder(api_list)
 gen_route(api_list)
 gen_error(error_list)
 
-system("cp " + $proj_path + "proto/error_code.txt " + $proj_path + "proto/svn/error_code.txt")
+system("cp " + $proto_path + "error_code.txt " + $svn_path + "error_code.txt")

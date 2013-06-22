@@ -20,10 +20,10 @@ OPTS = \
 	$(NULL)
 
 # rebar-用于编译
-REBAR := ./bin/rebar --config config/rebar.config
+REBAR := ./bin/rebar
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
-REBAR := ./bin/rebar.linux --config config/rebar.config
+REBAR := ./bin/rebar.linux
 # do something Linux-y
 endif
 
@@ -40,6 +40,10 @@ t:
 
 c:
 	$(REBAR) clean
+
+# cc:
+# 	rm proto/code/*
+# 	rm ebin/proto/
 
 # 调用生成器生成代码
 g:
