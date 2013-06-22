@@ -43,7 +43,7 @@ c:
 
 # 调用生成器生成代码
 g:
-	cd src/ && ruby ./proto_gen.rb
+	ruby src/proto_gen2.rb
 
 s:
 	erl $(OPTS) -name $(NODE) -s slg_proto start
