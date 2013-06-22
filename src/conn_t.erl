@@ -14,6 +14,10 @@ start() ->
   ?MODULE:login(Pid, "xewfwe4", "few"),
   ok.
 
+send(ApiType, Payload, Socket) ->
+  Bin = proto_encoder:encode(ApiType, Payload),
+  gen_tcp:send(Socket, Bin).
+
 %% api
 start_link(IP, Port) ->
   gen_server:start_link(?MODULE, [IP, Port], []).
@@ -34,18 +38,11 @@ init([IP, Port]) ->
 handle_cast(_, State) ->
   {noreply, State}.
 
-handle_call({register, Name, Udid}, _From, State=#state{socket=Socket}) ->
-  Base = #pt_ubase{name=Name, sex=1, invite=""},
-  Device = #db_device{udid=Udid},
-  proto_request:register_req(#pt_account{base=Base, device=Device}, Socket),
-  {reply, ok, State};
-
 handle_call({login, Name, Udid}, _From, State=#state{socket=Socket}) ->
-  Base = #pt_ubase{name=Name, sex=1, invite=""},
+  Base = #pt_ubase{name=Name, sex=1},
   Device = #db_device{udid=Udid},
-  proto_request:login_req(#pt_account{base=Base, device=Device}, Socket),
+  send(login_req, #pt_account{base=Base, device=Device}, Socket),
   {reply, ok, State};
-
 
 handle_call(_Msg, _From, State) ->
   {reply, ok, State}.
