@@ -7,9 +7,7 @@
 -module(proto_payload).
 -compile(export_all).
 
--include("proto_api.hrl").
 -include("proto_record.hrl").
--include("proto_error.hrl").
 
 %% 解析integer
 encode_integer(true) -> <<1:32>>;

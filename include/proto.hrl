@@ -1,4 +1,2 @@
--include("proto_error.hrl").
 -include("proto_record.hrl").
--include("proto_api.hrl").
 -include("proto_const.hrl").
