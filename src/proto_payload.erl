@@ -9,45 +9,34 @@
 
 -include("proto_record.hrl").
 
-%% 解析integer
-encode_integer(true) -> <<1:32>>;
-encode_integer(false) -> <<0:32>>;
-encode_integer(Int) when is_integer(Int) ->
-  <<Int:32>>.
-decode_integer(<<Integer:32/signed, Data/binary>>)  ->
+encode_integer(Int) -> <<Int:32/signed-big-integer>>.
+decode_integer(<<Integer:32/signed-big-integer, Data/binary>>) ->
   {Integer, Data}.
 
 %% 解析short
-encode_short(Short) ->
-  <<Short:16>>.
-decode_short(<<Short:16/signed, Data/binary>>)  ->
+encode_short(Short) -> <<Short:16/signed-big-integer>>.
+decode_short(<<Short:16/signed-big-integer, Data/binary>>) ->
   {Short, Data}.
 
-
-%% 解析pkid
-encode_pkid(Pkid) when is_list(Pkid) ->
-  encode_string(Pkid);
-encode_pkid(Pkid) when is_integer(Pkid) ->
-  L = integer_to_list(Pkid),
-  encode_string(L).
-
-decode_pkid(<<Length:16/unsigned-big-integer, Data/binary>>) ->
-  {StringData, StringLeftData} = split_binary(Data,Length),
-  String = binary_to_list(StringData),
-  {list_to_integer(String), StringLeftData}.
+%% 解析short
+encode_char(Short) -> <<Short:8/signed-big-integer>>.
+decode_char(<<Short:8/signed-big-integer, Data/binary>>) ->
+  {Short, Data}.
 
 %% 解析short
-encode_boolean(Bool) when is_boolean(Bool) ->
-  case Bool of
-    true -> <<1:8>>;
-    false -> <<0:8>>
-  end.
+encode_uinteger(Short) -> <<Short:32/unsigned-big-integer>>.
+decode_uinteger(<<Short:32/unsigned-big-integer, Data/binary>>) ->
+  {Short, Data}.
 
-decode_boolean(<<BoolVal:8/signed, Data/binary>>) ->
-  case BoolVal of
-    0 -> {false, Data};
-    _ -> {true, Data}
-  end.
+%% 解析short
+encode_ushort(Short) -> <<Short:16/unsigned-big-integer>>.
+decode_ushort(<<Short:16/unsigned-big-integer, Data/binary>>) ->
+  {Short, Data}.
+
+%% 解析short
+encode_uchar(Short) -> <<Short:8/unsigned-big-integer>>.
+decode_uchar(<<Short:8/unsigned-big-integer, Data/binary>>) ->
+  {Short, Data}.
 
 %% 解析float
 encode_float(Float) when is_float(Float) ->
@@ -57,23 +46,35 @@ decode_float(<<Float:32/float, Data/binary>>)  ->
 
 encode_string(<<BinS/binary>>) ->
   L = byte_size(BinS),
-  list_to_binary([<<L:16>>, BinS]);
-
-%% 特殊处理。
-encode_string(Val) when is_integer(Val) ->
-  encode_string(integer_to_list(Val));
-
-%% 解析string
-encode_string(String) when is_list(String) ->
-  StringLen = length(String),
-  %% BinS = unicode:characters_to_binary(String),
-  %%L = byte_size(BinS),
-  list_to_binary([<<StringLen:16>>, String]).
-
-decode_string(<<Length:16/unsigned-big-integer,Data/binary>>)  ->
+  list_to_binary([<<L:16>>, BinS]).
+decode_string(<<Length:16/unsigned-big-integer,Data/binary>>) ->
   {StringData, StringLeftData} = split_binary(Data,Length),
-  String = StringData, %%, binary_to_list(StringData),
-  {String, StringLeftData}.
+  {StringData, StringLeftData}.
+
+%% 解析short
+encode_boolean(Bool) when is_boolean(Bool) ->
+  case Bool of
+    true -> <<1:8>>;
+    false -> <<0:8>>
+  end.
+decode_boolean(<<BoolVal:8, Data/binary>>) ->
+  case BoolVal of
+    0 -> {false, Data};
+    _ -> {true, Data}
+  end.
+
+%% 解析pkid
+encode_pkid(<<Pkid/binary>>)  ->
+  encode_string(Pkid);
+encode_pkid(Pkid) when is_integer(Pkid) ->
+  L = list_to_binary(integer_to_list(Pkid)),
+  encode_string(L).
+
+decode_pkid(<<Length:16/unsigned-big-integer, Data/binary>>) ->
+  {StringData, StringLeftData} = split_binary(Data,Length),
+  String = binary_to_list(StringData),
+  {list_to_integer(String), StringLeftData}.
+
 
 %% 解析数组编码
 encode_array_item([],_Fun) ->

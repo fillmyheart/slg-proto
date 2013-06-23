@@ -25,15 +25,27 @@ end
 
 # 各种类型默认值
 $default_v = {
+  "boolean" => "false",
+  "uchar" => "0",
+  "char" => "0",
+  "ushort" => "0",
+  "short" => "0",
+  "uinteger" => "0",
   "integer" => "0",
   "string" => "<<\"\">>",
-  "pkid" => "0"
+  "pkid" => "<<\"0\">>"
 }
 
 $default_t = {
+  "boolean" => "atom()",
+  "uchar" => "integer()",
+  "char" => "integer()",
+  "ushort" => "integer()",
+  "short" => "integer()",
+  "uinteger" => "integer()",
   "integer" => "integer()",
   "string" => "binary()",
-  "pkid" => "integer()"
+  "pkid" => "binary()"
 }
 
 def record_default(type, default = nil)
@@ -199,6 +211,7 @@ def gen_indian_encode(file, proto)
   file.write("\n\n")
 end
 
+# 解码不认masked.
 def gen_indian_decode(file, proto)
   proto_name = proto["name"].caplize
   c = "<" + "<Data/binary>>"
