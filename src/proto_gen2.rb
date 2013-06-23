@@ -298,6 +298,21 @@ def gen_route(api_list)
   file.close()
 end
 
+# 生成原子与api数字的对应关系.
+def gen_api_key(api_list)
+  file = open($code_path + "proto_api.erl", "w")
+  file.write("-module(proto_api).\n")
+  file.write("-export([key/1]).\n\n")
+  api_list.each_with_index do |x, index|
+    if index == api_list.length - 1
+      file.write("key(#{x["name"]}) -> #{x["packet_type"]}.\n")
+    else
+      file.write("key(#{x["name"]}) -> #{x["packet_type"]};\n")
+    end
+  end
+  file.close()
+end
+
 # 生成错误码映射.
 def gen_error(error_list)
   file = open($code_path + "proto_error.erl", "w")
@@ -325,6 +340,7 @@ gen_indian(proto_list)
 gen_encoder(api_list)
 gen_decoder(api_list)
 gen_route(api_list)
+gen_api_key(api_list)
 gen_error(error_list)
 
 system("cp " + $proto_path + "error_code.txt " + $svn_path + "error_code.txt")
