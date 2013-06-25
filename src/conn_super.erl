@@ -15,6 +15,14 @@
 start_player(Port) ->
   supervisor:start_child(?MODULE, [Port]).
 
+heartbeat() ->
+  All = supervisor:which_children(?MODULE),
+  lists:foreach(fun({undefined, Pid, worker, []}) ->
+    conn:heart_beat(Pid) end, All), 
+  timer:apply_after(5000, io, format, ["~nHello World!~n", []]),
+  heartbeat().
+
+
 init([]) ->
   {ok,
    {_SupFlags = {simple_one_for_one, ?MAX_RESTART, ?MAX_TIME},
